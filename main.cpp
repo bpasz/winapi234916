@@ -25,6 +25,7 @@ HWND hS_text[6];
 LPSTR *liczba[5];
 
 
+
 int WINAPI WinMain (HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine,
@@ -101,9 +102,9 @@ int WINAPI WinMain (HINSTANCE hInstance,
     wstaw(&hStatic[4], "XL[Ohm]=");
     wstaw(&hStatic[5], "Z[Ohm]=");
 
-    func(hText[0], liczba[0]);
-    func(hText[1], liczba[1]);
-    func(hText[2], liczba[2]);
+    func(hText[0]);
+    //func(hText[1], liczba[1]);
+    //func(hText[2], liczba[2]);
     //while()
 
     /* Make the window visible on the screen */
@@ -111,18 +112,7 @@ int WINAPI WinMain (HINSTANCE hInstance,
     UpdateWindow(hWnd);
 
     // Wyswietlenie obrazu
-    HBITMAP hbmObraz;
-    hbmObraz = (HBITMAP)LoadImage(NULL, "Obwod RL.bmp", IMAGE_BITMAP, 0,0,LR_LOADFROMFILE);
-    HDC hdcOkno = GetDC(hWnd);
-    HDC hdcNowy = CreateCompatibleDC(hdcOkno);
-    BITMAP bmInfo;
-    GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
-    SelectObject(hdcNowy, hbmObraz);
-    BitBlt(hdcOkno, 450, 20, 320, 280, hdcNowy, 0, 0, SRCCOPY);
-    DeleteObject(hbmObraz);
-    DeleteDC(hdcNowy);
-    DeleteDC(hdcOkno);
-    ReleaseDC( hWnd, hdcOkno );
+
     //
     /* Run the message loop. It will run until GetMessage() returns 0 */
     while (GetMessage (&messages, NULL, 0, 0))
@@ -156,23 +146,55 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_PAINT:
         {
             PAINTSTRUCT ps; // deklaracja struktury
-            HDC hdc = BeginPaint( hwnd, & ps );
+            HDC hdcOkno = BeginPaint( hwnd, & ps );
             // instukcje rysuj¹ce coœ na oknie
             // ...
+             HBITMAP hbmObraz;
+    hbmObraz = (HBITMAP)LoadImage(NULL, "Obwod RL.bmp", IMAGE_BITMAP, 0,0,LR_LOADFROMFILE);
+
+    HDC hdcNowy = CreateCompatibleDC(hdcOkno);
+    BITMAP bmInfo;
+    GetObject(hbmObraz, sizeof(bmInfo), &bmInfo);
+    SelectObject(hdcNowy, hbmObraz);
+    BitBlt(hdcOkno, 450, 20, 320, 280, hdcNowy, 0, 0, SRCCOPY);
+    DeleteObject(hbmObraz);
+    DeleteDC(hdcNowy);
+    DeleteDC(hdcOkno);
+    ReleaseDC( hwnd, hdcOkno );
+
             EndPaint( hwnd, & ps ); // zwalniamy hdc
             break;
         }
-    }
+
+        case WM_COMMAND:
+            {
+                if(( HWND ) lParam == hPrzycisk )
+                {
+
+                    func()
+                    func()
+                    oblicz()
+
+                }
+
+            }
+
     return 0;
 }
-void func(HWND handle, LPSTR *buf)
+
+void oblicz()
+{
+}
+
+
+void func(HWND handle)
 {
     // Pobiera ilosc znaku w polu
     DWORD length = GetWindowTextLength(handle);
-    // Alokuje Pamiec dla tych znakow
-    *buf = (LPSTR) GlobalAlloc(GPTR, length);
+    // Alokuje Pamiec dla tych znakowC:\Users\Bartek\Desktop\tmp 234916
+    LPSTR buf = (LPSTR) GlobalAlloc(GPTR, length);
     // Pobiera tekst z okna i zapisuje je w buforze
-    GetWindowText(handle, *buf, length + 1);
+    GetWindowText(handle, buf, length + 1);
 }
 void value(int x1, int y1, int x2, int y2, HWND *hText, HWND hWnd, HINSTANCE hInstance)
 {
